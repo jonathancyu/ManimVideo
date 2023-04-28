@@ -4,7 +4,18 @@ import math
 
 
 class PartA(Scene):
+    def new_play(self, *args):
+        self.i += 1
+        self.remove(self.pagenum)
+        self.pagenum = Text(str(self.i)).to_corner(DL)
+        self.add(self.pagenum)
+        self.old_play(*args)
+        
     def construct(self):
+        self.i = 0
+        self.pagenum = Text("0").to_corner(DL)
+        self.old_play = self.play
+        self.play = self.new_play
         # section a
         self.triangle_group = VGroup()
         # Triangle
@@ -166,8 +177,19 @@ class PartA(Scene):
         self.play(Create(radius_label))
         return VGroup(circumcircle, P_point), radius, radius_label
 
-class PartB(Scene):
-    def consruct(self):
+class PartB(Scene):    
+    def new_play(self, *args):
+        self.i += 1
+        self.remove(self.pagenum)
+        self.pagenum = Text(str(self.i)).to_corner(DL)
+        self.add(self.pagenum)
+        self.old_play(*args)
+        
+    def construct(self):
+        self.i = 0
+        self.pagenum = Text("0").to_corner(DL)
+        self.old_play = self.play
+        self.play = self.new_play
         # section a
         self.group = VGroup()
 
@@ -306,7 +328,18 @@ class PartB(Scene):
         return centroid_point, centroid_label
 
 class PartC(Scene):
+    def new_play(self, *args):
+        self.i += 1
+        self.remove(self.pagenum)
+        self.pagenum = Text(str(self.i)).to_corner(DL)
+        self.add(self.pagenum)
+        self.old_play(*args)
+
     def construct(self):
+        self.i = 0
+        self.pagenum = Text("0").to_corner(DL)
+        self.old_play = self.play
+        self.play = self.new_play
        
         # Triangle
         A = np.array([0, 0.5, 0])
@@ -382,12 +415,20 @@ class PartC(Scene):
 
         self.play(Create(AGI_fill))
         # TODO: add animation to show that arms of triangle are equal
+        AG = Line(A, G, color=YELLOW, stroke_width=3)
+        AF = Line(A, F, color=YELLOW, stroke_width=3)
+        BG = Line(B, G, color=BLUE, stroke_width=3)
+        BE = Line(B, E, color=BLUE, stroke_width=3)
+        CE = Line(C, E, color=GREEN, stroke_width=3)
+        CF = Line(C, F, color=GREEN, stroke_width=3)
+
+        self.play(FadeOut(AFI_fill), FadeOut(AGI_fill))
+        self.play(FadeOut(triangle), Create(AG), Create(AF), Create(BG), Create(BE), Create(CE), Create(CF))
+
         self.wait(1)
 
         t46 = MathTex(r"p = AF + BE + EC", **tex_args).next_to(t41, DOWN, **align_args)
         self.play(TransformMatchingShapes(t45, t46))
-        self.play(FadeOut(AFI_fill))
-        self.play(FadeOut(AGI_fill))
 
         t47 = MathTex(r"p = AF + BC", **tex_args).next_to(t41, DOWN, **align_args)
         self.play(TransformMatchingShapes(t46, t47))
@@ -465,7 +506,18 @@ class PartC(Scene):
         return bisectors, bisector_angles
     
 class PartD(Scene): 
+    def new_play(self, *args):
+        self.i += 1
+        self.remove(self.pagenum)
+        self.pagenum = Text(str(self.i)).to_corner(DL)
+        self.add(self.pagenum)
+        self.old_play(*args)
+        
     def construct(self):
+        self.i = 0
+        self.pagenum = Text("0").to_corner(DL)
+        self.old_play = self.play
+        self.play = self.new_play
         A = np.array([2, 2, 0])
         B = np.array([0, -1.5, 0])
         C = np.array([6, -1.5, 0])
@@ -484,8 +536,9 @@ class PartD(Scene):
                      r"\overrightarrow{OG} = 2\overrightarrow{GE}\\").scale(0.8).to_corner(UR)
         self.play(Write(t0))
         self.wait(1)
-        t1 = MathTex(r"\text{Recall: } \overrightarrow{OH} = 3\overrightarrow{OG} = 6 \overrightarrow{GE}\\").to_corner(UL)
-        self.play(Write(t1))
+        t1 = MathTex(r"\text{Recall: } \overrightarrow{OH} = 3\overrightarrow{OG}", r" = 6 \overrightarrow{GE}\\").scale(0.5).to_corner(UL)
+        self.play(Write(t1[0]))
+        self.play(TransformMatchingShapes(t0[1], t1[1]), FadeOut(t0[0]))
         self.wait(1)
 
         t2 = MathTex(r"OI^2 = OG^2 + GI^2 - 2(OG)(GI)(\cos(\angle OGI))", r" & \text{    }(1)\\",
@@ -493,14 +546,26 @@ class PartD(Scene):
         self.play(Write(t2))
         self.wait(1)
 
-        t3 = MathTex(r"2\times(2) + (1)").scale(0.5).next_to(t2, DOWN*4, **align_args)
+        t21 = MathTex(r"\cos (\angle OGI) = -\cos (\angle IGE)").scale(0.5).next_to(t2, DOWN, **align_args)
+        self.play(Write(t21))
+        self.wait(1)
+        t22 = MathTex(r"OI^2 = OG^2 + GI^2 + 2GE.GI.\cos (\angle IGE)").scale(0.5).next_to(t21, DOWN, **align_args)
+        self.play(Write(t22))
+        self.wait(1)
+        t23 = MathTex(r"2EI^2 = 2EG^2 + 2GI^2 - 2EG.GI.\cos(\angle EGI)").scale(0.5).next_to(t2, DOWN, **align_args)
+        self.play(TransformMatchingShapes(t22, t23), FadeOut(t21))
+
+
+
+        t3 = MathTex(r"2\times(2) + (1)").scale(0.5).next_to(t23, DOWN*4, **align_args)
         self.play(Write(t3))
         self.wait(1)
 
-        t4 = MathTex("2EI^2 + OI^2", "=", "OG^2 + 2EG^2 + 3GI^2").scale(0.5).next_to(t2, DOWN, **align_args)
+        t4 = MathTex("2EI^2 + OI^2", "=", "OG^2 + 2EG^2 + 3GI^2").scale(0.5).next_to(t23, DOWN, **align_args)
         self.play(TransformMatchingShapes(t2.copy(), t4))
-        self.play(FadeOut(t3, t2, t1))
-
+        self.play(FadeOut(t3, t2, t1, t23))
+        
+        self.play(t4.animate.scale(1.5).to_corner(UL))
         self.wait(1)
 
         t5 = MathTex(r"EI^2 = \frac{1}{2}(OG^2 + 2EG^2 + 3GI^2 - OI^2)").scale(0.75).to_corner(UL)
@@ -538,8 +603,8 @@ class PartD(Scene):
         self.play(TransformMatchingShapes(t8, t11))
         self.wait(1)
 
-        t12 = MathTex(r"\frac{3}{2}OG^2 - 3GI^2 &=  (\frac{3}{2}R^2 + \frac{1}{3}r^2 - \frac{1}{3}p^2 + \frac{4}{3}Rr)\\",
-                                              r"&- (\frac{5}{3}r^2 + \frac{3}{9}p^2 - \frac{16}{3}Rr)").scale(0.75).next_to(t6, DOWN, **align_args)
+        t12 = MathTex(r"\frac{3}{2}OG^2 + 3GI^2 &=  (\frac{3}{2}R^2 + \frac{1}{3}r^2 - \frac{1}{3}p^2 + \frac{4}{3}Rr)\\",
+                                              r"&+ (\frac{5}{3}r^2 + \frac{3}{9}p^2 - \frac{16}{3}Rr)").scale(0.75).next_to(t6, DOWN, **align_args)
         self.play(TransformMatchingShapes(VGroup(t10, t11), t12))
         self.wait(1)
 
@@ -589,13 +654,15 @@ class PartD(Scene):
         incenter = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(P)
         self.play(Create(incenter))
         self.play(FadeOut(bisectors, bisector_angles))
-        incenter_label = MathTex("I").scale(0.5).move_to(P + [-0.2, -0.2, 0])
+        incenter_label = MathTex("I").scale(0.5).move_to(P + [0, -0.2, 0])
         incircle = Circle(radius=r, color=WHITE, stroke_width=2).move_to(P)
         self.play(Create(incircle))
-
+        radius = Line(P, P+ ([-1,-1,0]/np.sqrt(2)*r), color=WHITE, stroke_width=2)
+        radius_label = MathTex("r").scale(0.5).move_to(radius.get_center() + [-0.1, 0.1, 0])
         self.play(Write(incenter_label))
+        self.play(Create(radius), Write(radius_label))
         return VGroup(incenter, incenter_label)
-         
+   
     def circumcenter(self, A, B, C):
         x, y, r = calculate_circumcircle(A, B, C)
         P = np.array([x, y, 0])
@@ -676,14 +743,14 @@ class PartD(Scene):
 
 
         nine_point_circle = Circle(radius=R/2, color=WHITE, stroke_width=2).move_to(center)
-        nine_point_radius = Line(O, ([1,1,0]/np.sqrt(2))*R/2, stroke_width=2)
+        nine_point_radius = Line(center, center + ([1,1,0]/np.sqrt(2))*R/2, stroke_width=2)
         self.play(Create(lines))
         self.play(Create(nine_point_center))
         self.play(FadeOut(lines))
-        self.play(Create(nine_point_circle))
-        self.play(Write(nine_point_center_label))
+        self.play(Write(nine_point_center_label), Create(nine_point_circle))
         self.play(Create(nine_point_radius))
-        radius_label = MathTex("r").scale(0.5).move_to(nine_point_radius.get_center() + [-0.3, 0.3, 0])
+        radius_label = MathTex("R/2").scale(0.5).move_to(nine_point_radius.get_center() + [-0.1, 0.1, 0])
+        self.play(Write(radius_label))
         return VGroup(nine_point_center, nine_point_center_label, nine_point_circle)
 
 
@@ -700,6 +767,309 @@ class PartD(Scene):
             angle_bisector_equality(B, C, A, P, 3)
         )
         return bisectors, bisector_angles
+
+
+class PartE(Scene):
+    def new_play(self, *args):
+        self.i += 1
+        self.remove(self.pagenum)
+        self.pagenum = Text(str(self.i)).to_corner(DL)
+        self.add(self.pagenum)
+        self.old_play(*args)
+        
+    def construct(self):
+        self.i = 0
+        self.pagenum = Text("0").to_corner(DL)
+        self.old_play = self.play
+        self.play = self.new_play
+        A = np.array([2, 2, 0])
+        B = np.array([0, -1.5, 0])
+        C = np.array([6, -1.5, 0])
+        triangle = Polygon(A, B, C)
+        self.play(Create(triangle))
+        incenter = self.incenter(A, B, C)
+        circumcenter, O, R = self.circumcenter(A, B, C)
+        centroid = self.centroid(A, B, C)
+        orthocenter, H = self.orthocenter(A, B, C)
+        nine_point_center = self.nine_point_center(O, H, R)
+
+        excircles = self.excircles(A, B, C)
+        self.play(FadeOut(excircles))
+
+        align_args = {"aligned_edge": LEFT}
+        t1 = MathTex(r"3MG^2 = MA^2 + MB^2 + MC^2 - \frac{1}{3}(AB^2+AC^2+BC^2)").scale(0.5).to_corner(UL)
+        self.play(Write(t1))
+        self.wait(1)
+
+        t2 = MathTex(r"OG^2 = R^2 - \frac{1}{9}(a^2+b^2+c^2").scale(0.5).next_to(t1, DOWN, **align_args)
+        self.play(Write(t2))
+        self.wait(1)
+
+        t3 = MathTex(r"AE = \frac{1}{2}\sqrt{2AH^2+2AO^2-2HO^2}").scale(0.5).next_to(t2, DOWN, **align_args)
+        self.play(Write(t3))
+        self.wait(1)
+
+        t4 = MathTex("OH = 3GO").scale(0.5).next_to(t3, DOWN, **align_args)
+        self.play(Write(t4))
+        self.wait(1)
+
+        t41 = MathTex("OH^2 = 9GO^2").scale(0.5).next_to(t3, DOWN, **align_args)
+        self.play(TransformMatchingShapes(t4, t41))
+        self.wait(1)
+
+        t5 = MathTex("AO = R").scale(0.5).next_to(t41, DOWN, **align_args)
+        self.play(Write(t5))
+        self.wait(1)
+
+        t6 = MathTex(r"AH = 2R\cos(\angle A)").scale(0.5).next_to(t5, DOWN, **align_args)
+        self.play(Write(t6))
+        self.wait(1)
+
+        t7 = MathTex(
+            r"AE = \frac{1}{2} \sqrt{R^2 + c^2 + b^2 - a^2} = \frac{1}{2}\sqrt{R^2+2bc\cos(\angle A)}\\",
+            r"BE = \frac{1}{2} \sqrt{R^2 + c^2 + a^2 - b^2} = \frac{1}{2}\sqrt{R^2+2ac\cos(\angle B)}\\",
+            r"CE = \frac{1}{2} \sqrt{R^2 + a^2 + b^2 - c^2} = \frac{1}{2}\sqrt{R^2+2ab\cos(\angle C)}\\"
+        ).scale(0.5).next_to(t6, DOWN, **align_args)
+        self.play(Write(t7[0]))
+        self.wait(1)
+        self.play(Write(t7[1:]))
+        self.wait(1)
+
+        self.play(FadeOut(t1, t2, t3, t41, t5, t6), t7.animate.to_corner(UL))
+        self.wait(1)
+
+        t8 = MathTex(r"IM^2 = \frac{aAM^2 + bBM^2 + cCM^2 - abc}{a+b+c}").scale(0.5).next_to(t7, DOWN, **align_args)
+        self.play(Write(t8))
+        self.wait(1)
+        t81 = MathTex(
+            r"I_1M^2 &= \frac{-aAM^2 + bBM^2 + cCM^2 + abc}{-a+b+c}\\",
+            r"I_2M^2 &= \frac{aAM^2 - bBM^2 + cCM^2 + abc}{a-b+c}\\",
+            r"I_3M^2 &= \frac{aAM^2 + bBM^2 - cCM^2 + abc}{a+b-c}"        
+        ).scale(0.5).next_to(t7, DOWN, **align_args)
+        self.play(TransformMatchingShapes(t8, t81[0]))
+        self.wait(1)
+        self.play(Write(t81[1:]))
+        self.wait(1)
+
+        t9 = MathTex(r"I_1E^2 = \frac{-aAE^2 + bBE^2 + cCE^2 + abc}{-a+b+c}").scale(0.5).next_to(t7, DOWN, **align_args)
+        self.play(FadeOut(t81[1:]))
+        self.play(TransformMatchingShapes(t81[0], t9))
+        self.wait(1)
+
+        t10 = MathTex(
+            r"I_1E^2 = \frac{\frac{R^2}{4}(-a+b+c) + \frac{abc}{2}(\cos(\angle A) + \cos(\angle B) + \cos(\angle C)) + abc}{-a + b + c}",
+        ).scale(0.5).next_to(t7, DOWN, **align_args)
+        self.play(TransformMatchingShapes(t9, t10))
+        self.wait(1)
+
+        t11 = MathTex(
+            r"I_1E^2 &= (\frac{R}{2}+r_1)^2",
+        ).scale(0.5).next_to(t10, DOWN, **align_args)
+        self.play(Write(t11))
+        self.wait(1)
+        self.play(FadeOut(t10, t7), t11.animate.scale(2).to_corner(UL))
+        t12 = MathTex(
+            r"I_1E &= \frac{R}{2}+r_1\\",
+            r"I_2E &= \frac{R}{2}+r_2\\",
+            r"I_3E &= \frac{R}{2}+r_3",
+        ).to_corner(UL)
+        self.play(TransformMatchingShapes(t11, t12[0]))
+        self.wait(1)
+        self.play(Write(t12[1:]))
+        self.wait(1)
+        self.play(FadeIn(excircles))
+        
+
+
+    def incenter(self, A, B, C):
+
+
+        x, y, r = calculate_incircle(A, B, C)
+        P = np.array([x, y, 0])
+        I = P
+        bisectors, bisector_angles = self.bisectors(A, B, C, P)
+
+        incenter = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(P)
+        incenter_label = MathTex("I").scale(0.5).move_to(P + [0, -0.2, 0])
+        incircle = Circle(radius=r, color=WHITE, stroke_width=2).move_to(P)
+        elbow_args = {"stroke_width": 2, "radius": 0.2, "color": WHITE, "elbow": True}
+        perp_args = {"stroke_width": 2, "color": WHITE}
+        E = foot_of_perpendicular(B, I, C)
+        IE = Line(E, I, **perp_args)
+        IE_angle = Angle.from_three_points(C, E, I, **elbow_args)
+        E_label = MathTex("E").move_to(E + [0, -0.3, 0])
+
+        F = foot_of_perpendicular(A, I, C)
+        IF = Line(F, I, **perp_args)
+        IF_angle = Angle.from_three_points(A, F, I, **elbow_args)
+        F_label = MathTex("F").move_to(F + [0.3, 0.3, 0])
+
+        G = foot_of_perpendicular(B, I, A)
+        IG = Line(G, I, **perp_args)
+        IG_angle = Angle.from_three_points(A, G, I, **elbow_args)
+        G_label = MathTex("G").move_to(G + [-0.3, 0.3, 0])
+
+        self.play(Create(bisectors))
+        self.play(Create(bisector_angles))
+        self.play(Create(incenter))
+        self.play(Create(incircle))
+        self.play(Write(incenter_label))
+
+        self.play(Create(IE), Create(IF), Create(IG), Write(E_label), Write(F_label), Write(G_label), Create(IE_angle), Create(IF_angle), Create(IG_angle))
+
+        
+        AG = Line(A, G, color=YELLOW, stroke_width=3)
+        AF = Line(A, F, color=YELLOW, stroke_width=3)
+        BG = Line(B, G, color=BLUE, stroke_width=3)
+        BE = Line(B, E, color=BLUE, stroke_width=3)
+        CE = Line(C, E, color=GREEN, stroke_width=3)
+        CF = Line(C, F, color=GREEN, stroke_width=3)
+
+        self.play(FadeOut(self.triangle), Create(AG), Create(AF), Create(BG), Create(BE), Create(CE), Create(CF))
+
+    def incenter(self, A, B, C):
+
+        x, y, r = calculate_incircle(A, B, C)
+        P = np.array([x, y, 0])
+
+        bisectors, bisector_angles = self.bisectors(A, B, C, P)
+
+        self.play(Create(bisectors))
+        self.play(Create(bisector_angles))
+        incenter = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(P)
+        self.play(Create(incenter))
+        self.play(FadeOut(bisectors, bisector_angles))
+        incenter_label = MathTex("I").scale(0.5).move_to(P + [0, -0.2, 0])
+        incircle = Circle(radius=r, color=WHITE, stroke_width=2).move_to(P)
+        self.play(Create(incircle))
+        self.play(Write(incenter_label))
+        return VGroup(incenter, incenter_label)
+         
+    def circumcenter(self, A, B, C):
+        x, y, r = calculate_circumcircle(A, B, C)
+        P = np.array([x, y, 0])
+
+        m_AB = (A + B)/2
+        m_BC = (B + C)/2
+        m_AC = (A + C)/2
+
+        perp_bisector_group = VGroup(
+            Line(m_AB, P, stroke_width=2),
+            Line(m_BC, P, stroke_width=2),
+            Line(m_AC, P, stroke_width=2),
+            Angle.from_three_points(A, m_AB, P, radius=0.2, elbow=True, stroke_width=2),
+            Angle.from_three_points(B, m_BC, P, radius=0.2, elbow=True, stroke_width=2),
+            Angle.from_three_points(C, m_AC, P, radius=0.2, elbow=True, stroke_width=2)
+        )
+        self.play(Create(perp_bisector_group))
+
+        circumcenter = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(P)
+        circumcenter_label = MathTex("O").scale(0.5).move_to(P + [0.2, -0.2, 0])
+        self.play(Create(circumcenter))
+        self.play(FadeOut(perp_bisector_group))
+        self.play(Write(circumcenter_label))
+
+        return VGroup(circumcenter, circumcenter_label), P, r
+
+    def centroid(self, A, B, C):
+        m_AB = (A + B)/2
+        m_BC = (B + C)/2
+        m_AC = (A + C)/2
+        line_args = {"stroke_width": 2, "color": WHITE}
+        median_A = Line(A, m_BC, **line_args)
+        median_B = Line(B, m_AC, **line_args)
+        median_C = Line(C, m_AB, **line_args)
+
+        self.play(Create(median_A), Create(median_B), Create(median_C))
+        P = (A + B + C)/3
+        centroid = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(P)
+        centroid_label = MathTex("G").scale(0.5).move_to(P + [0.2, -0.2, 0])
+        self.play(Create(centroid))
+        self.play(FadeOut(median_A, median_B, median_C))
+        self.play(Write(centroid_label))
+        return VGroup(centroid, centroid_label)
+    
+    def orthocenter(self, A, B, C):
+        elbow_args = {"stroke_width": 2, "radius": 0.2, "color": WHITE, "elbow": True}
+       
+        fA = foot_of_perpendicular(B, A,  C)
+        fB = foot_of_perpendicular(A, B, C)
+        fC = foot_of_perpendicular(A, C, B)
+        lA = Line(fA, A, stroke_width=2)
+        lB = Line(fB, B, stroke_width=2)
+        lC = Line(fC, C, stroke_width=2)
+        eA = Angle.from_three_points(B, fA, A, **elbow_args)
+        eB = Angle.from_three_points(A, fB, B, **elbow_args)
+        eC = Angle.from_three_points(A, fC, C, **elbow_args)
+
+        P = seg_intersect(fA, A, fB, B)
+
+        orthocenter = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(P)
+        self.play(Create(lA), Create(lB), Create(lC), Create(eA), Create(eB), Create(eC))
+        self.play(Create(orthocenter))
+        #self.play(FadeOut(lA, lB, lC, eA, eB, eC))
+        orthocenter_label = MathTex("H").scale(0.5).move_to(P + [0.2, -0.2, 0])
+        self.play(Write(orthocenter_label))
+        return VGroup(orthocenter, orthocenter_label), P
+
+    def nine_point_center(self, O, H, R):
+        center = (O + H)/2
+        nine_point_center = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(center)
+        nine_point_center_label = MathTex("E").scale(0.5).move_to(center + [0, 0.3, 0])
+        lines = VGroup(
+            Line(O, center, stroke_width=2),
+            Line(H, center, stroke_width=2)
+        )
+
+
+        nine_point_circle = Circle(radius=R/2, color=WHITE, stroke_width=2).move_to(center)
+        nine_point_radius = Line(center, center + ([1,1,0]/np.sqrt(2))*R/2, stroke_width=2)
+        self.play(Create(lines))
+        self.play(Create(nine_point_center))
+        self.play(FadeOut(lines))
+        self.play(Write(nine_point_center_label), Create(nine_point_circle))
+        return VGroup(nine_point_center, nine_point_center_label, nine_point_circle)
+
+    def bisectors(self, A, B, C, P):
+        bisectors = VGroup(
+            Line(A, P, stroke_width=2), 
+            Line(B, P, stroke_width=2), 
+            Line(C, P, stroke_width=2)
+        )
+        bisector_angles = VGroup(
+            angle_bisector_equality(C, A, B, P, 1),
+            angle_bisector_equality(A, B, C, P, 2),
+            angle_bisector_equality(B, C, A, P, 3)
+        )
+        return bisectors, bisector_angles
+    
+    def excircles(self, A, B, C):
+        a = np.linalg.norm(B - C)
+        b = np.linalg.norm(A - C)
+        c = np.linalg.norm(A - B)
+        s = (a + b + c)/2
+        area = np.sqrt(s*(s-a)*(s-b)*(s-c))
+        D = (a*A + b*B - c*C)/(a + b - c)
+        E = (a*A - b*B + c*C)/(a - b + c)
+        F = (-a*A + b*B + c*C)/(-a + b + c)
+        r_d = area/(s-c)
+        r_e = area/(s-b)
+        r_f = area/(s-a)
+        D_circle = Circle(radius=r_d, color=WHITE, stroke_width=2).move_to(D)
+        E_circle = Circle(radius=r_e, color=WHITE, stroke_width=2).move_to(E)
+        F_circle = Circle(radius=r_f, color=WHITE, stroke_width=2).move_to(F)
+        D_dot = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(D)
+        E_dot = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(E)
+        F_dot = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(F)
+        D_label = MathTex("I_1").scale(0.5).move_to(D + [0.2, -0.2, 0])
+        E_label = MathTex("I_2").scale(0.5).move_to(E + [0.2, -0.2, 0])
+        F_label = MathTex("I_3").scale(0.5).move_to(F + [0.2, -0.2, 0])
+        self.play(Create(D_circle), Create(E_circle), Create(F_circle))
+        self.play(Create(D_dot), Create(E_dot), Create(F_dot))
+        self.play(Write(D_label), Write(E_label), Write(F_label))
+
+        return VGroup(D_circle, E_circle, F_circle, D_label, E_label, F_label, D_dot, E_dot, F_dot)
+
 
     
 
@@ -782,3 +1152,27 @@ def seg_intersect(a1,a2, b1,b2) :
     denom = np.dot( dap, db)
     num = np.dot( dap, dp )
     return (num / denom.astype(float))*db + b1
+
+class Example(Scene): 
+    def new_play(self, *args):
+        self.i += 1
+        self.remove(self.pagenum)
+        self.pagenum = Text(str(self.i)).to_corner(DL)
+        self.add(self.pagenum)
+        self.old_play(*args)
+        
+    def construct(self):
+        self.i = 0
+        self.pagenum = Text("0").to_corner(DL)
+        self.old_play = self.play
+        self.play = self.new_play
+        
+        A = np.array([0, 0.5, 0])
+        B = np.array([-1, -2.5, 0])
+        C = np.array([5, -2.5, 0])
+        self.play(Line(A, B))
+        self.play(Line(B, C))
+        self.play(Line(C, A))
+        self.play(Write(Tex("A").move_to(A + [0, 0.2, 0])))
+        self.play(Write(Tex("B").move_to(B + [-0.2, -0.2, 0])))
+        self.play(Write(Tex("C").move_to(C + [0.2, -0.2, 0])))
