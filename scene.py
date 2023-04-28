@@ -1,7 +1,9 @@
 from manim import *
 import math
 
-
+align_args = {"aligned_edge": LEFT}
+point_args = {"radius":0.01, "color":RED, "fill_opacity":1}
+tex_args = {"font_size":40}
 
 class PartA(Scene):
     def new_play(self, *args):
@@ -77,34 +79,53 @@ class PartA(Scene):
 
 
 
-        t1 = MathTex("2p^2 - 2r^2 - 8Rr", r"= 2p^2 - \frac{2p(p-a)(p-b)(p-c)}{p^2} - \frac{2abc}{p}").to_edge(UP).shift(DOWN*2)
+        t1 = MathTex("2p^2 - 2r^2 - 8Rr = ", r"2p^2 - \frac{2p(p-a)(p-b)(p-c)}{p^2} - \frac{2abc}{p}").to_edge(UP).shift(DOWN*2)
         self.play(Create(t1))
-        self.wait(0.5)
+        self.wait(5)
 
         t2 = MathTex(r"= \frac{2p^3 - 2(p-c)(p^2-pb-pa-ab)-2abc}{p}").next_to(t1, DOWN)
         self.play(TransformMatchingShapes(t1[1].copy(), t2))
-        self.wait(0.5)
+        self.wait(5)
+        self.play(FadeOut(t1[1]))
 
-        t3 = MathTex(r"= \frac{2p^3 - 2(p^3 - p^2b-p^2a + abp - cp^2 + pbc + acp - abc) - 2abc}{p}").move_to(t2)
-        self.play(TransformMatchingShapes(t2, t3))
-        self.wait(0.5)
+        t3 = MathTex(r"= \frac{2p^3 - 2(p^3 - p^2b-p^2a + abp - cp^2 + pbc + acp - abc) - 2abc}{p}").next_to(t2, DOWN)
+        self.play(Create(t3))
+        self.wait(5)
+        self.play(FadeOut(t2), t3.animate.next_to(t1, DOWN))
+        self.wait(5)
 
 
-        t4 = MathTex(r"= 2(pb + pa + pc - ab - ac - bc)").move_to(t3)
-        self.play(TransformMatchingShapes(t3, t4))
-        self.wait(0.5)
+        t4 = MathTex(r"= 2(pb + pa + pc - ab - ac - bc)").next_to(t3, DOWN)
+        self.play(Create(t4))
+        self.wait(5)
+        self.play(FadeOut(t3), t4.animate.next_to(t1, DOWN))
+        self.wait(5)
 
-        t5 = MathTex(r"= (a + b + c)(a) + (a + b + c)(b) + (a + b + c)(c)").move_to(t4)
-        self.play(TransformMatchingShapes(t4, t5))
-        self.wait(0.5)
+        t5 = MathTex(r"= (a + b + c)(a) + (a + b + c)(b) + (a + b + c)(c)").next_to(t4, DOWN)
+        self.play(Create(t5))
+        self.wait(5)
+        self.play(FadeOut(t4), t5.animate.next_to(t1, DOWN))
+        self.wait(5)
 
-        t6 = MathTex(r"= ab +", "b^2", "+ bc +", "a^2",  "+ ab + ac + ac + bc +", "c^2", "- 2ab - 2ac - 2bc").move_to(t5)
-        self.play(TransformMatchingShapes(t5, t6))
-        self.wait(0.5)
+        t6 = MathTex(r"= ab +", "b^2", "+ bc +", "a^2",  "+ ab + ac + ac + bc +", "c^2", "- 2ab - 2ac - 2bc").next_to(t5, DOWN)
+        self.play(Create(t6))
+        self.wait(5)
+        self.play(FadeOut(t5), t6.animate.next_to(t1, DOWN))
+        self.wait(5)
 
         t7 = MathTex("=", "a^2", "+", "b^2", "+", "c^2").next_to(t6, DOWN)
-        self.play(TransformMatchingTex(t6.copy(), t7))
-        self.wait(0.5)
+        self.play(Create(t7))
+        self.wait(5)
+        self.play(FadeOut(t6), t7.animate.next_to(t1, DOWN))
+        self.wait(5)
+
+        t8 = MathTex("2p^2 - 2r^2 - 8Rr ","=", "a^2+b^2+c^2").next_to(t7, DOWN)
+        self.play(Create(t8), FadeOut(t1, t7))
+
+        rect = SurroundingRectangle(t8, buff=0.1, color=YELLOW)
+        self.play(Create(rect))
+        equation = VGroup(t8, rect)
+        self.play(equation.animate.scale(0.6).to_corner(UR))
 
     
     def bisectors(self, A, B, C, P):
@@ -129,7 +150,7 @@ class PartA(Scene):
 
         self.play(Create(bisectors))
         self.play(Create(bisector_angles))
-        P_point = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(P)
+        P_point = Circle(**point_args).move_to(P)
         self.play(Create(P_point))
         self.play(FadeOut(bisectors, bisector_angles))
 
@@ -164,7 +185,7 @@ class PartA(Scene):
         self.triangle_group.add(perp_bisector_group)
         self.play(Create(perp_bisector_group))
 
-        P_point = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(P)
+        P_point = Circle(**point_args).move_to(P)
         
         self.play(Create(P_point))
 
@@ -191,6 +212,14 @@ class PartB(Scene):
         self.old_play = self.play
         self.play = self.new_play
         # section a
+        
+        equation1 = MathTex("2p^2 - 2r^2 - 8Rr ","=", "a^2+b^2+c^2").scale(0.6).to_corner(UR)
+        rect1 = SurroundingRectangle(equation1, buff=0.1, color=YELLOW)
+        equation1_group = VGroup(equation1, rect1)
+        self.add(equation1_group)
+
+
+
         self.group = VGroup()
 
         # Triangle
@@ -241,7 +270,7 @@ class PartB(Scene):
             print(new_pos)
             self.play(x.animate.set_value(center[0] + pos[0]), 
                       y.animate.set_value(center[1] + pos[1]))
-            self.wait(0.5)
+            self.wait(5)
         
         v_MG = G.get_center() - M.get_center()
         v_MA = A - M.get_center()
@@ -269,40 +298,46 @@ class PartB(Scene):
         self.play(Transform(a_MG, a_MG1), Transform(a_MA, a_MA1), Transform(a_MB, a_MB1), Transform(a_MC, a_MC1))
         self.play(Create(a_MG2))
         self.play(Create(a_MG3))
-        self.wait(1)
-        tex_args = {"font_size":40}
+        self.wait(5)
         t1 = MathTex(r"3\overrightarrow{MG}", "=", r"\overrightarrow{MA}",  "+",  r"\overrightarrow{MB}",  "+", r"\overrightarrow{MC}", **tex_args).to_edge(UP)
         self.play(Write(t1))
         self.play(FadeOut(a_MG), FadeOut(a_MA), FadeOut(a_MB), FadeOut(a_MC), FadeOut(a_MG1), FadeOut(a_MG2), FadeOut(a_MG3), FadeOut(a_MA1), FadeOut(a_MB1), FadeOut(a_MC1))
         self.play(t1.animate.shift(DOWN*2))
-        self.wait(1)
+        self.wait(5)
         t2 = MathTex("9MG^2", "=", "MA^2", "+", "MB^2", "+", "MC^2" + "+", r"2\overrightarrow{MA}.\overrightarrow{MB}", "+", r"2\overrightarrow{MB}.\overrightarrow{MC}", "+", r"2\overrightarrow{MB}.\overrightarrow{MC}",
                      **tex_args).next_to(t1, DOWN)
         t2_desc = MathTex(r"(\overrightarrow{MA}.\overrightarrow{MB} = MA^2 + MB^2 - AB^2})", **tex_args).next_to(t2, UP)
         self.play(TransformMatchingShapes(t1.copy(), t2))
-        self.wait(1)
+        self.wait(5)
         self.play(FadeOut(t1))
-        self.wait(0.5)
+        self.wait(5)
 
         self.play(Write(t2_desc))
-        self.wait(1)
+        self.wait(5)
 
         t3 = MathTex("9MG^2", "&=", "MA^2", "+", "MB^2", "+", r"MC^2\\" +
                       r"&+ (MA^2 + MB^2 - AB^2)\\",
                       r"&+ (MB^2 + MC^2 - BC^2)\\",
                       r"&+ (MC^2 + MA^2 - AC^2)\\", **tex_args).next_to(t2, DOWN)
-        self.play(TransformMatchingShapes(t2.copy(), t3))
-        self.wait(1)
-        self.play(FadeOut(t2, t2_desc))
+        self.play(Create(t3))
+        self.wait(5)
+        self.play(FadeOut(t2, t2_desc), t3.animate.to_edge(UP).shift(DOWN*2))
+        self.wait(5)
+        t4 = MathTex("9MG^2", "&=", r"3(MA^2 + MB^2 + MC^2) - (AB^2 + AC^2 + BC2)", **tex_args).next_to(t3, DOWN)
+        self.play(Create(t4))
+        self.wait(5)    
+        self.play(FadeOut(t3), t4.animate.to_edge(UP).shift(DOWN*2))
+        self.wait(5)
 
-        t4 = MathTex("9MG^2", "&=", r"3(MA^2 + MB^2 + MC^2) - (AB^2 + AC^2 + BC2)", **tex_args).next_to(t1, DOWN)
-        self.play(TransformMatchingShapes(t3, t4))
-        self.wait(1)
-
-        t5 = MathTex("3MG", "&=", r"MA^2 + MB^2 + MC^2 - \tfrac{1}{3}(AB^2 + AC^2 + BC^2)", **tex_args).next_to(t1, DOWN)
-        self.play(TransformMatchingShapes(t4, t5))
-        self.wait(1)
-        # Let M = I
+        equation2 = MathTex("3MG", "&=", r"MA^2 + MB^2 + MC^2 - \tfrac{1}{3}(AB^2 + AC^2 + BC^2)", **tex_args).next_to(t1, DOWN)
+        self.play(Create(equation2))
+        self.wait(5)
+        rect2 = SurroundingRectangle(equation2, buff=0.1)
+        self.play(Create(rect2))
+        self.wait(5)
+        equation2_group = VGroup(equation2, rect2)
+        self.play(equation2_group.animate.scale(0.4))
+        self.play(equation2_group.animate.next_to(equation1, DOWN, aligned_edge=RIGHT))
 
 
         
@@ -340,6 +375,20 @@ class PartC(Scene):
         self.pagenum = Text("0").to_corner(DL)
         self.old_play = self.play
         self.play = self.new_play
+        tex_args = {"font_size": 40}
+
+        # Old equations
+        equation1 = MathTex("2p^2 - 2r^2 - 8Rr ","=", "a^2+b^2+c^2").scale(0.4)
+        equation1.to_corner(UR)
+        rect1 = SurroundingRectangle(equation1, buff=0.1, color=YELLOW)
+        equation1_group = VGroup(equation1, rect1)
+
+        equation2 = MathTex("3MG", "&=", r"MA^2 + MB^2 + MC^2 - \tfrac{1}{3}(AB^2 + AC^2 + BC^2)", **tex_args).scale(0.4)
+        equation2.next_to(equation1, DOWN, aligned_edge=RIGHT)
+        rect2 = SurroundingRectangle(equation2, buff=0.1)
+        equation2_group = VGroup(equation2, rect2)
+
+        self.add(equation1_group, equation2_group)
        
         # Triangle
         A = np.array([0, 0.5, 0])
@@ -362,14 +411,16 @@ class PartC(Scene):
 
         I, incircle = self.incircle(A, B, C)
         # I = M
-        tex_args = {"font_size": 40}
+
+        
+
         align_args = {"aligned_edge": LEFT, "buff": 0.1}
         t0 = MathTex(r"3MG^2 = MA^2 + MB^2 + MC^2 - \tfrac{1}{3}(AB^2 + AC^2 + BC^2)", **tex_args).to_corner(UL)
         self.play(Write(t0))
-        self.wait(1)
+        self.wait(5)
         t1 = Tex(r"Let $M \equiv I$").next_to(t0, DOWN)
         self.play(Write(t1))
-        self.wait(1)
+        self.wait(5)
         t2 = MathTex(r"3IG^2 = IA^2 + IB^2 + IC^2 - \tfrac{1}{3}(AB^2 + AC^2 + BC^2)", **tex_args).to_corner(UL)
         self.play(TransformMatchingShapes(t0,t2))
         self.play(FadeOut(t1))
@@ -403,15 +454,15 @@ class PartC(Scene):
         t41 = MathTex(r"IA^2 = IF^2 + AF^2", **tex_args).next_to(t2, DOWN, **align_args)
         t42 = MathTex(r"p = \frac{a + b + c}{2}", **tex_args).next_to(t41, DOWN, **align_args)
         self.play(Write(t41))
-        self.wait(1)
+        self.wait(5)
         self.play(Write(t42))
        
-        self.wait(1)
+        self.wait(5)
 
         t45 = MathTex(r"p = \frac{(AF + FC) + (AG + GB) + (BE + EC)}{2}", **tex_args).next_to(t41, DOWN, **align_args)
         self.play(TransformMatchingShapes(t42, t45))
         AGI_fill = Polygon(A, I, G, color=YELLOW)
-        self.wait(1)
+        self.wait(5)
 
         self.play(Create(AGI_fill))
         # TODO: add animation to show that arms of triangle are equal
@@ -425,7 +476,7 @@ class PartC(Scene):
         self.play(FadeOut(AFI_fill), FadeOut(AGI_fill))
         self.play(FadeOut(triangle), Create(AG), Create(AF), Create(BG), Create(BE), Create(CE), Create(CF))
 
-        self.wait(1)
+        self.wait(5)
 
         t46 = MathTex(r"p = AF + BE + EC", **tex_args).next_to(t41, DOWN, **align_args)
         self.play(TransformMatchingShapes(t45, t46))
@@ -436,15 +487,15 @@ class PartC(Scene):
         self.play(TransformMatchingShapes(t47, t48))
         t49 = MathTex(r"AF = p - a", **tex_args).next_to(t41, DOWN, **align_args)
         self.play(TransformMatchingShapes(t48, t49, path_arc=PI/2))
-        self.wait(1)
+        self.wait(5)
 
         t5 = MathTex(r"IA^2 = IF^2 + (p-a)^2\\", **tex_args).next_to(t2, DOWN, **align_args)
         self.play(TransformMatchingShapes(t41, t5))
-        self.wait(1)
+        self.wait(5)
 
         t51 = MathTex(r"IA^2 = r^2 + (p-a)^2\\", **tex_args).next_to(t2, DOWN, **align_args)
         self.play(TransformMatchingShapes(t5, t51))
-        self.wait(1)
+        self.wait(5)
         self.play(FadeOut(t49))
         t6 = MathTex(r"IB^2 =  r^2 + (p-b)^2\\", **tex_args).next_to(t51, DOWN, **align_args)
         t7 = MathTex(r"IC^2 = r^2 + (p-c)^2\\", **tex_args).next_to(t6, DOWN, **align_args)
@@ -452,25 +503,33 @@ class PartC(Scene):
 
         t8 = MathTex(r"3IG^2 = (p-a)^2 + (p-b)^2 + (p-c)^2 + 3r^2 - \frac{1}{3}(a^2+b^2+c^2)", **tex_args).to_corner(UL)
         self.play(TransformMatchingShapes(t2, t8))
-        self.wait(1)
+        self.wait(5)
         self.play(FadeOut(t51), FadeOut(t6), FadeOut(t7))
 
         t9 = MathTex(r"3IG^2 = 3r^2 - p^2 + \frac{2}{3}(a^2+b^2+c^2)", **tex_args).to_corner(UL)
         self.play(TransformMatchingShapes(t8, t9))
-        self.wait(1)
+        self.wait(5)
         #TODO: pring in part a
         t10 = MathTex(r"3IG^2 = 3r^2 - p^2 + \frac{2}{3}(2p^2 -2r^2 - 8Rr)", **tex_args).to_corner(UL)
         self.play(TransformMatchingShapes(t9, t10))
-        self.wait(1)
+        self.wait(5)
         t11 = MathTex(r"9IG^2 = 9r^2 - 3p^2 + 4p^2 - 4r^2 - 16Rr", **tex_args).to_corner(UL)
         self.play(TransformMatchingShapes(t10, t11))
-        self.wait(1)
+        self.wait(5)
         t12 = MathTex(r"9IG^2 =5r^2 - p^2 - 16Rr", **tex_args).to_corner(UL)
         self.play(TransformMatchingShapes(t11, t12))
-        self.wait(1)
-        t13 = MathTex(r"IG^2 = \frac{5r^2 - p^2 - 16Rr}{9}", **tex_args).to_corner(UL)
-        self.play(TransformMatchingShapes(t12, t13))    
-        self.wait(1)
+        self.wait(5)
+        equation3 = MathTex(r"IG^2 = \frac{5r^2 - p^2 - 16Rr}{9}", **tex_args).to_corner(UL)
+        self.play(TransformMatchingShapes(t12, equation3))    
+        self.wait(5)
+
+        
+        rect3 = SurroundingRectangle(equation3, buff=0.1, color=YELLOW)
+        self.play(Create(rect3))
+
+        self.wait(5)
+        self.play(VGroup(equation3, rect3).animate.to_corner(DL))
+
 
 
 
@@ -483,7 +542,7 @@ class PartC(Scene):
 
         self.play(Create(bisectors))
         self.play(Create(bisector_angles))
-        P_point = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(P)
+        P_point = Circle(**point_args).move_to(P)
         P_label = MathTex("I").move_to(P + [0.3, -0.3, 0])
         self.play(Create(P_point))
         self.play(Write(P_label))
@@ -515,9 +574,27 @@ class PartD(Scene):
         
     def construct(self):
         self.i = 0
-        self.pagenum = Text("0").to_corner(DL)
-        self.old_play = self.play
-        self.play = self.new_play
+        #self.pagenum = Text("0").to_corner(DL)
+        #self.old_play = self.play
+        #self.play = self.new_play
+
+
+        
+        # Old equations
+        equation1 = MathTex("2p^2 - 2r^2 - 8Rr ","=", "a^2+b^2+c^2").scale(0.4)
+        equation1.to_corner(UR)
+        rect1 = SurroundingRectangle(equation1, buff=0.1, color=YELLOW)
+
+        equation2 = MathTex("3MG", "&=", r"MA^2 + MB^2 + MC^2 - \tfrac{1}{3}(AB^2 + AC^2 + BC^2)", **tex_args).scale(0.4)
+        equation2.next_to(equation1, DOWN, aligned_edge=RIGHT)
+        rect2 = SurroundingRectangle(equation2, buff=0.1)
+        
+        equation3 = MathTex(r"IG^2 = \frac{5r^2 - p^2 - 16Rr}{9}", **tex_args).to_corner(DL)
+        rect3 = SurroundingRectangle(equation3, buff=0.1, color=YELLOW)
+
+        self.add(equation1, rect1, equation2, rect2, equation3, rect3)
+
+
         A = np.array([2, 2, 0])
         B = np.array([0, -1.5, 0])
         C = np.array([6, -1.5, 0])
@@ -535,23 +612,23 @@ class PartD(Scene):
         t0 = MathTex(r"\text{\underline{Euler's Theorem}}: \\",
                      r"\overrightarrow{OG} = 2\overrightarrow{GE}\\").scale(0.8).to_corner(UR)
         self.play(Write(t0))
-        self.wait(1)
+        self.wait(5)
         t1 = MathTex(r"\text{Recall: } \overrightarrow{OH} = 3\overrightarrow{OG}", r" = 6 \overrightarrow{GE}\\").scale(0.5).to_corner(UL)
         self.play(Write(t1[0]))
         self.play(TransformMatchingShapes(t0[1], t1[1]), FadeOut(t0[0]))
-        self.wait(1)
+        self.wait(5)
 
         t2 = MathTex(r"OI^2 = OG^2 + GI^2 - 2(OG)(GI)(\cos(\angle OGI))", r" & \text{    }(1)\\",
                      r"EI^2 = EG^2 + GI^2 - 2(EG)(GI)(\cos(\angle EGI))", r" & \text{    }(2)\\").scale(0.5).next_to(t1, DOWN, **align_args)
         self.play(Write(t2))
-        self.wait(1)
+        self.wait(5)
 
         t21 = MathTex(r"\cos (\angle OGI) = -\cos (\angle IGE)").scale(0.5).next_to(t2, DOWN, **align_args)
         self.play(Write(t21))
-        self.wait(1)
+        self.wait(5)
         t22 = MathTex(r"OI^2 = OG^2 + GI^2 + 2GE.GI.\cos (\angle IGE)").scale(0.5).next_to(t21, DOWN, **align_args)
         self.play(Write(t22))
-        self.wait(1)
+        self.wait(5)
         t23 = MathTex(r"2EI^2 = 2EG^2 + 2GI^2 - 2EG.GI.\cos(\angle EGI)").scale(0.5).next_to(t2, DOWN, **align_args)
         self.play(TransformMatchingShapes(t22, t23), FadeOut(t21))
 
@@ -559,78 +636,78 @@ class PartD(Scene):
 
         t3 = MathTex(r"2\times(2) + (1)").scale(0.5).next_to(t23, DOWN*4, **align_args)
         self.play(Write(t3))
-        self.wait(1)
+        self.wait(5)
 
         t4 = MathTex("2EI^2 + OI^2", "=", "OG^2 + 2EG^2 + 3GI^2").scale(0.5).next_to(t23, DOWN, **align_args)
         self.play(TransformMatchingShapes(t2.copy(), t4))
         self.play(FadeOut(t3, t2, t1, t23))
         
         self.play(t4.animate.scale(1.5).to_corner(UL))
-        self.wait(1)
+        self.wait(5)
 
         t5 = MathTex(r"EI^2 = \frac{1}{2}(OG^2 + 2EG^2 + 3GI^2 - OI^2)").scale(0.75).to_corner(UL)
         self.play(TransformMatchingShapes(t4, t5))
-        self.wait(1)
+        self.wait(5)
 
         t6 = MathTex(r"EI^2 = \frac{1}{2} (\frac{3}{2}OG^2 + 3GI^2 - ","OI^2)").scale(0.75).to_corner(UL)
         self.play(TransformMatchingShapes(t5, t6))
-        self.wait(1)
+        self.wait(5)
 
         t8 = MathTex(r"GI^2 = \frac{Sr^2 + p^2 - 16Rr}{9}").scale(0.75).next_to(t6, DOWN, **align_args)
         self.play(Write(t8))
-        self.wait(1)
+        self.wait(5)
 
         t9 = MathTex(r"3MG^2 = MA^2 + MB^2 + MC^2 - \frac{1}{3}(AB^2 + AC^2 + BC^2)").scale(0.75).next_to(t8, DOWN, **align_args)
         self.play(Write(t9))
         t91 = MathTex(r"3OG^2 = OA^2 + OB^2 + OC^2 - \frac{1}{3}(a^2 + b^2 + c^2)").scale(0.75).next_to(t8, DOWN, **align_args)
         self.play(TransformMatchingShapes(t9, t91))
-        self.wait(1)
+        self.wait(5)
         t92 = MathTex(r"3OG^2 = 3R^2 - \frac{1}{3}(2p^2-2r^2+8Rr)").scale(0.75).next_to(t8, DOWN, **align_args)
         self.play(TransformMatchingShapes(t91, t92))
-        self.wait(1)
+        self.wait(5)
         t93 = MathTex(r"OG^2 = R^2 - \frac{1}{9}(2P^2 - 2r^2 + 8Rr)").scale(0.75).next_to(t8, DOWN, **align_args)
         self.play(TransformMatchingShapes(t92, t93))
-        self.wait(1)
+        self.wait(5)
         t94 = MathTex(r"OG^2 = \frac{1}{9}(9R^2 - 2p^2 - 2r^2 + 8Rr)").scale(0.75).next_to(t8, DOWN, **align_args)
         self.play(TransformMatchingShapes(t93, t94))
-        self.wait(1)
+        self.wait(5)
 
         t10 = MathTex(r"\frac{3}{2}OG^2 = \frac{3}{2}R^2 + \frac{1}{3}r^2 - \frac{1}{3}p^2 + \frac{4}{3}Rr").scale(0.75).next_to(t8, DOWN, **align_args)
         self.play(TransformMatchingShapes(t94, t10))
-        self.wait(1)
+        self.wait(5)
 
         t11 = MathTex(r"3GI = \frac{5}{3}r^2 + \frac{3}{9}p^2 - \frac{16}{3}Rr").scale(0.75).next_to(t6, DOWN, **align_args)
         self.play(TransformMatchingShapes(t8, t11))
-        self.wait(1)
+        self.wait(5)
 
         t12 = MathTex(r"\frac{3}{2}OG^2 + 3GI^2 &=  (\frac{3}{2}R^2 + \frac{1}{3}r^2 - \frac{1}{3}p^2 + \frac{4}{3}Rr)\\",
                                               r"&+ (\frac{5}{3}r^2 + \frac{3}{9}p^2 - \frac{16}{3}Rr)").scale(0.75).next_to(t6, DOWN, **align_args)
         self.play(TransformMatchingShapes(VGroup(t10, t11), t12))
-        self.wait(1)
+        self.wait(5)
 
         t13 = MathTex(r"-OI^2 = -R^2 + 2Rr").scale(0.75).next_to(t6, DOWN, **align_args)
         self.play(TransformMatchingShapes(t12, t13))
-        self.wait(1)
+        self.wait(5)
 
         t14 = MathTex(r"OI^2 = R^2 - 2Rr").scale(0.75).next_to(t6, DOWN, **align_args)
         self.play(TransformMatchingShapes(t13, t14))
-        self.wait(1)
+        self.wait(5)
 
         t15 = MathTex(r"EI^2 = \frac{1}{2} (\frac{3}{2}OG^2 + 3GI^2 - ","(R^2 - 2Rr))").scale(0.75).to_corner(UL)
         self.play(TransformMatchingShapes(VGroup(t14, t6[1]), t15[1]))
-        self.wait(1)
+        self.wait(5)
 
         t16 = MathTex(r"EI^2 = \frac{1}{2} (\frac{1}{2}R^2 + 2r^2 - 2Rr)").scale(0.75).to_corner(UL)
         self.play(TransformMatchingShapes(t15, t16), FadeOut(t6[0]))
-        self.wait(1)
+        self.wait(5)
 
         t17 = MathTex(r"EI^2 = \frac{1}{4}(R-2r)^2").scale(0.75).to_corner(UL)
         self.play(TransformMatchingShapes(t16, t17))
-        self.wait(1)
+        self.wait(5)
 
         t18 = MathTex(r"EI = \left|\frac{R}{2}-r\right|").scale(0.75).to_corner(UL)
         self.play(TransformMatchingShapes(t17, t18))
-        self.wait(1)
+        self.wait(5)
 
 
 
@@ -651,7 +728,7 @@ class PartD(Scene):
 
         self.play(Create(bisectors))
         self.play(Create(bisector_angles))
-        incenter = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(P)
+        incenter = Circle(**point_args).move_to(P)
         self.play(Create(incenter))
         self.play(FadeOut(bisectors, bisector_angles))
         incenter_label = MathTex("I").scale(0.5).move_to(P + [0, -0.2, 0])
@@ -681,7 +758,7 @@ class PartD(Scene):
         )
         self.play(Create(perp_bisector_group))
 
-        circumcenter = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(P)
+        circumcenter = Circle(**point_args).move_to(P)
         circumcenter_label = MathTex("O").scale(0.5).move_to(P + [0.2, -0.2, 0])
         circumcircle = Circle(radius=r, color=WHITE, stroke_width=2).move_to(P)
         self.play(Create(circumcenter))
@@ -702,7 +779,7 @@ class PartD(Scene):
 
         self.play(Create(median_A), Create(median_B), Create(median_C))
         P = (A + B + C)/3
-        centroid = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(P)
+        centroid = Circle(**point_args).move_to(P)
         centroid_label = MathTex("G").scale(0.5).move_to(P + [0.2, -0.2, 0])
         self.play(Create(centroid))
         self.play(FadeOut(median_A, median_B, median_C))
@@ -724,7 +801,7 @@ class PartD(Scene):
 
         P = seg_intersect(fA, A, fB, B)
 
-        orthocenter = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(P)
+        orthocenter = Circle(**point_args).move_to(P)
         self.play(Create(lA), Create(lB), Create(lC), Create(eA), Create(eB), Create(eC))
         self.play(Create(orthocenter))
         #self.play(FadeOut(lA, lB, lC, eA, eB, eC))
@@ -734,7 +811,7 @@ class PartD(Scene):
 
     def nine_point_center(self, O, H, R):
         center = (O + H)/2
-        nine_point_center = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(center)
+        nine_point_center = Circle(**point_args).move_to(center)
         nine_point_center_label = MathTex("E").scale(0.5).move_to(center + [0, 0.3, 0])
         lines = VGroup(
             Line(O, center, stroke_width=2),
@@ -781,7 +858,24 @@ class PartE(Scene):
         self.i = 0
         self.pagenum = Text("0").to_corner(DL)
         self.old_play = self.play
-        self.play = self.new_play
+        #self.play = self.new_play
+
+        # equations
+        equation1 = MathTex("2p^2 - 2r^2 - 8Rr ","=", "a^2+b^2+c^2").scale(0.4)
+        equation1.to_corner(UR)
+        rect1 = SurroundingRectangle(equation1, buff=0.1, color=YELLOW)
+
+        equation2 = MathTex("3MG", "&=", r"MA^2 + MB^2 + MC^2 - \tfrac{1}{3}(AB^2 + AC^2 + BC^2)", **tex_args).scale(0.4)
+        equation2.next_to(equation1, DOWN, aligned_edge=RIGHT)
+        rect2 = SurroundingRectangle(equation2, buff=0.1)
+        
+        equation3 = MathTex(r"IG^2 = \frac{5r^2 - p^2 - 16Rr}{9}", **tex_args).to_corner(DL)
+        rect3 = SurroundingRectangle(equation3, buff=0.1, color=YELLOW)
+
+        self.add(equation1, rect1, equation2, rect2, equation3, rect3)
+
+
+
         A = np.array([2, 2, 0])
         B = np.array([0, -1.5, 0])
         C = np.array([6, -1.5, 0])
@@ -796,34 +890,35 @@ class PartE(Scene):
         excircles = self.excircles(A, B, C)
         self.play(FadeOut(excircles))
 
-        align_args = {"aligned_edge": LEFT}
         t1 = MathTex(r"3MG^2 = MA^2 + MB^2 + MC^2 - \frac{1}{3}(AB^2+AC^2+BC^2)").scale(0.5).to_corner(UL)
-        self.play(Write(t1))
-        self.wait(1)
+        self.play(FadeOut(rect2))
+        self.play(Transform(equation2, t1))
+        self.wait(5)
+        self.remove(equation2)
 
-        t2 = MathTex(r"OG^2 = R^2 - \frac{1}{9}(a^2+b^2+c^2").scale(0.5).next_to(t1, DOWN, **align_args)
+        t2 = MathTex(r"OG^2 = R^2 - \frac{1}{9}(a^2+b^2+c^2()").scale(0.5).next_to(t1, DOWN, **align_args)
         self.play(Write(t2))
-        self.wait(1)
+        self.wait(5)
 
         t3 = MathTex(r"AE = \frac{1}{2}\sqrt{2AH^2+2AO^2-2HO^2}").scale(0.5).next_to(t2, DOWN, **align_args)
         self.play(Write(t3))
-        self.wait(1)
+        self.wait(5)
 
         t4 = MathTex("OH = 3GO").scale(0.5).next_to(t3, DOWN, **align_args)
         self.play(Write(t4))
-        self.wait(1)
+        self.wait(5)
 
         t41 = MathTex("OH^2 = 9GO^2").scale(0.5).next_to(t3, DOWN, **align_args)
         self.play(TransformMatchingShapes(t4, t41))
-        self.wait(1)
+        self.wait(5)
 
         t5 = MathTex("AO = R").scale(0.5).next_to(t41, DOWN, **align_args)
         self.play(Write(t5))
-        self.wait(1)
+        self.wait(5)
 
         t6 = MathTex(r"AH = 2R\cos(\angle A)").scale(0.5).next_to(t5, DOWN, **align_args)
         self.play(Write(t6))
-        self.wait(1)
+        self.wait(5)
 
         t7 = MathTex(
             r"AE = \frac{1}{2} \sqrt{R^2 + c^2 + b^2 - a^2} = \frac{1}{2}\sqrt{R^2+2bc\cos(\angle A)}\\",
@@ -831,42 +926,42 @@ class PartE(Scene):
             r"CE = \frac{1}{2} \sqrt{R^2 + a^2 + b^2 - c^2} = \frac{1}{2}\sqrt{R^2+2ab\cos(\angle C)}\\"
         ).scale(0.5).next_to(t6, DOWN, **align_args)
         self.play(Write(t7[0]))
-        self.wait(1)
+        self.wait(5)
         self.play(Write(t7[1:]))
-        self.wait(1)
+        self.wait(5)
 
         self.play(FadeOut(t1, t2, t3, t41, t5, t6), t7.animate.to_corner(UL))
-        self.wait(1)
+        self.wait(5)
 
         t8 = MathTex(r"IM^2 = \frac{aAM^2 + bBM^2 + cCM^2 - abc}{a+b+c}").scale(0.5).next_to(t7, DOWN, **align_args)
         self.play(Write(t8))
-        self.wait(1)
+        self.wait(5)
         t81 = MathTex(
             r"I_1M^2 &= \frac{-aAM^2 + bBM^2 + cCM^2 + abc}{-a+b+c}\\",
             r"I_2M^2 &= \frac{aAM^2 - bBM^2 + cCM^2 + abc}{a-b+c}\\",
             r"I_3M^2 &= \frac{aAM^2 + bBM^2 - cCM^2 + abc}{a+b-c}"        
         ).scale(0.5).next_to(t7, DOWN, **align_args)
         self.play(TransformMatchingShapes(t8, t81[0]))
-        self.wait(1)
+        self.wait(5)
         self.play(Write(t81[1:]))
-        self.wait(1)
+        self.wait(5)
 
         t9 = MathTex(r"I_1E^2 = \frac{-aAE^2 + bBE^2 + cCE^2 + abc}{-a+b+c}").scale(0.5).next_to(t7, DOWN, **align_args)
         self.play(FadeOut(t81[1:]))
         self.play(TransformMatchingShapes(t81[0], t9))
-        self.wait(1)
+        self.wait(5)
 
         t10 = MathTex(
             r"I_1E^2 = \frac{\frac{R^2}{4}(-a+b+c) + \frac{abc}{2}(\cos(\angle A) + \cos(\angle B) + \cos(\angle C)) + abc}{-a + b + c}",
         ).scale(0.5).next_to(t7, DOWN, **align_args)
         self.play(TransformMatchingShapes(t9, t10))
-        self.wait(1)
+        self.wait(5)
 
         t11 = MathTex(
             r"I_1E^2 &= (\frac{R}{2}+r_1)^2",
         ).scale(0.5).next_to(t10, DOWN, **align_args)
         self.play(Write(t11))
-        self.wait(1)
+        self.wait(5)
         self.play(FadeOut(t10, t7), t11.animate.scale(2).to_corner(UL))
         t12 = MathTex(
             r"I_1E &= \frac{R}{2}+r_1\\",
@@ -874,9 +969,9 @@ class PartE(Scene):
             r"I_3E &= \frac{R}{2}+r_3",
         ).to_corner(UL)
         self.play(TransformMatchingShapes(t11, t12[0]))
-        self.wait(1)
+        self.wait(5)
         self.play(Write(t12[1:]))
-        self.wait(1)
+        self.wait(5)
         self.play(FadeIn(excircles))
         
 
@@ -889,7 +984,7 @@ class PartE(Scene):
         I = P
         bisectors, bisector_angles = self.bisectors(A, B, C, P)
 
-        incenter = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(P)
+        incenter = Circle(**point_args).move_to(P)
         incenter_label = MathTex("I").scale(0.5).move_to(P + [0, -0.2, 0])
         incircle = Circle(radius=r, color=WHITE, stroke_width=2).move_to(P)
         elbow_args = {"stroke_width": 2, "radius": 0.2, "color": WHITE, "elbow": True}
@@ -936,7 +1031,7 @@ class PartE(Scene):
 
         self.play(Create(bisectors))
         self.play(Create(bisector_angles))
-        incenter = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(P)
+        incenter = Circle(**point_args).move_to(P)
         self.play(Create(incenter))
         self.play(FadeOut(bisectors, bisector_angles))
         incenter_label = MathTex("I").scale(0.5).move_to(P + [0, -0.2, 0])
@@ -963,7 +1058,7 @@ class PartE(Scene):
         )
         self.play(Create(perp_bisector_group))
 
-        circumcenter = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(P)
+        circumcenter = Circle(**point_args).move_to(P)
         circumcenter_label = MathTex("O").scale(0.5).move_to(P + [0.2, -0.2, 0])
         self.play(Create(circumcenter))
         self.play(FadeOut(perp_bisector_group))
@@ -982,7 +1077,7 @@ class PartE(Scene):
 
         self.play(Create(median_A), Create(median_B), Create(median_C))
         P = (A + B + C)/3
-        centroid = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(P)
+        centroid = Circle(**point_args).move_to(P)
         centroid_label = MathTex("G").scale(0.5).move_to(P + [0.2, -0.2, 0])
         self.play(Create(centroid))
         self.play(FadeOut(median_A, median_B, median_C))
@@ -1004,7 +1099,7 @@ class PartE(Scene):
 
         P = seg_intersect(fA, A, fB, B)
 
-        orthocenter = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(P)
+        orthocenter = Circle(**point_args).move_to(P)
         self.play(Create(lA), Create(lB), Create(lC), Create(eA), Create(eB), Create(eC))
         self.play(Create(orthocenter))
         #self.play(FadeOut(lA, lB, lC, eA, eB, eC))
@@ -1014,7 +1109,7 @@ class PartE(Scene):
 
     def nine_point_center(self, O, H, R):
         center = (O + H)/2
-        nine_point_center = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(center)
+        nine_point_center = Circle(**point_args).move_to(center)
         nine_point_center_label = MathTex("E").scale(0.5).move_to(center + [0, 0.3, 0])
         lines = VGroup(
             Line(O, center, stroke_width=2),
@@ -1058,9 +1153,9 @@ class PartE(Scene):
         D_circle = Circle(radius=r_d, color=WHITE, stroke_width=2).move_to(D)
         E_circle = Circle(radius=r_e, color=WHITE, stroke_width=2).move_to(E)
         F_circle = Circle(radius=r_f, color=WHITE, stroke_width=2).move_to(F)
-        D_dot = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(D)
-        E_dot = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(E)
-        F_dot = Circle(radius=0.05, color=RED, fill_opacity=1).move_to(F)
+        D_dot = Circle(**point_args).move_to(D)
+        E_dot = Circle(**point_args).move_to(E)
+        F_dot = Circle(**point_args).move_to(F)
         D_label = MathTex("I_1").scale(0.5).move_to(D + [0.2, -0.2, 0])
         E_label = MathTex("I_2").scale(0.5).move_to(E + [0.2, -0.2, 0])
         F_label = MathTex("I_3").scale(0.5).move_to(F + [0.2, -0.2, 0])
