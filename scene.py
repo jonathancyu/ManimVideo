@@ -4,7 +4,10 @@ import math
 align_args = {"aligned_edge": LEFT}
 point_args = {"radius":0.01, "color":RED, "fill_opacity":1}
 tex_args = {"font_size":40}
+elbow_args = {"stroke_width": 2, "radius": 0.2, "color": WHITE, "elbow": True}
+perp_args = {"stroke_width": 2, "color": WHITE}
 
+line_args = {"stroke_width": 2, "color": WHITE}
 class PartA(Scene):
     def new_play(self, *args):
         self.i += 1
@@ -772,7 +775,6 @@ class PartD(Scene):
         m_AB = (A + B)/2
         m_BC = (B + C)/2
         m_AC = (A + C)/2
-        line_args = {"stroke_width": 2, "color": WHITE}
         median_A = Line(A, m_BC, **line_args)
         median_B = Line(B, m_AC, **line_args)
         median_C = Line(C, m_AB, **line_args)
@@ -1165,8 +1167,398 @@ class PartE(Scene):
 
         return VGroup(D_circle, E_circle, F_circle, D_label, E_label, F_label, D_dot, E_dot, F_dot)
 
+# Problem 2.26
+class rs_equals_K(Scene):
+    def construct(self):
+        A = np.array([0, 0.5, 0])
+        B = np.array([-1, -2.5, 0])
+        C = np.array([5, -2.5, 0])
 
+        triangle = Polygon(A, B, C) 
+        point_labels = VGroup(
+            Tex("A").move_to(A + [0, 0.2, 0]),
+            Tex("B").move_to(B + [-0.2, -0.2, 0]),
+            Tex("C").move_to(C + [0.2, -0.2, 0]),
+        )
+        edge_labels = VGroup(
+            Tex("a").move_to((B + C) / 2 + [0, -0.2, 0]),
+            Tex("b").move_to((A + C) / 2 + [0.2, 0.2, 0]),
+            Tex("c").move_to((A + B) / 2 + [-0.2, 0, 0]),
+        )
+        triangle_group = VGroup(triangle, point_labels, edge_labels)
+        self.play(Create(triangle_group))
+
+        I, incircle = self.incircle(A, B, C)
+
+
+        E = foot_of_perpendicular(B, I, C)
+        IE = Line(E, I, **perp_args)
+        IE_angle = Angle.from_three_points(C, E, I, **elbow_args)
+        E_label = MathTex("E").move_to(E + [0, -0.3, 0])
+
+        F = foot_of_perpendicular(A, I, C)
+        IF = Line(F, I, **perp_args)
+        IF_angle = Angle.from_three_points(A, F, I, **elbow_args)
+        F_label = MathTex("F").move_to(F + [0.3, 0.3, 0])
+
+        G = foot_of_perpendicular(B, I, A)
+        IG = Line(G, I, **perp_args)
+        IG_angle = Angle.from_three_points(A, G, I, **elbow_args)
+        G_label = MathTex("G").move_to(G + [-0.3, 0.3, 0])
+
+        self.play(Create(IE), Create(IE_angle), Create(IF), Create(IF_angle), Create(IG), Create(IG_angle), Create(E_label), Create(F_label), Create(G_label))
+
+        AI = DashedLine(A, I, **line_args)
+        BI = DashedLine(B, I, **line_args)
+        CI = DashedLine(C, I, **line_args)
+        self.play(Create(AI), Create(BI), Create(CI))
+
+        t0 = MathTex(r"K_{ABC} = ","K_{IBC} + K_{IAC} + K_{IAB}").to_corner(UL)
+        self.play(Create(t0))
+        self.wait(5)
+
+        t1 = MathTex(r"K_{IBC}=\frac{1}{2}(IU)(BC)", r"=\frac{1}{2}(r)(a)").next_to(t0, DOWN, **align_args)
+        self.play(Create(t1))
+        self.wait(5)
+
+        t2 = MathTex(r"K_{IAC}=\frac{1}{2}rb").next_to(t1, DOWN, **align_args)
+        t3 = MathTex(r"K_{IAB}=\frac{1}{2}rc").next_to(t2, DOWN, **align_args)
+        self.play(Create(t2), Create(t3))
+
+        self.wait(5)
+
+        t4 = MathTex(r"K_{ABC} = \frac{1}{2}ra + \frac{1}{2}rb + \frac{1}{2}rc", 
+                     r"= \frac{1}{2}r(a+b+c))", r"=rs").to_corner(UL)
+        self.play(FadeOut(t0), Create(t4[0]), FadeOut(t1), FadeOut(t2), FadeOut(t3))
+        self.wait(5)
+
+        self.play(Create(t4[1]))
+        self.wait(5)
+        self.play(Create(t4[2]))
+        self.wait(5)
+
+
+        t5 = MathTex(r"r=\frac{K_{ABC}}{s}",
+                     r"=\sqrt{\frac{s(s-a)(s-b)(s-c)}{s}}"
+                     ).next_to(t4, DOWN, **align_args)
+        self.play(Create(t5[0]))
+        self.wait(5)
+        self.play(FadeOut(t4))
+        self.play(Create(t5[1]))
+        self.wait(5)
+
+
+    def incircle(self, A, B, C):
+
+        x, y, r = calculate_incircle(A, B, C)
+        P = np.array([x, y, 0])
+
+        bisectors, bisector_angles = self.bisectors(A, B, C, P)
+
+        self.play(Create(bisectors))
+        self.play(Create(bisector_angles))
+        P_point = Circle(**point_args).move_to(P)
+        P_label = MathTex("I").move_to(P + [0.3, -0.3, 0])
+        self.play(Create(P_point))
+        self.play(Write(P_label))
+        self.play(FadeOut(bisectors, bisector_angles))
+        incircle = Circle(radius=r).move_to(P)
+        self.play(Create(incircle))
+        return P, VGroup(P_point, P_label, incircle)
+
+    def bisectors(self, A, B, C, P):
+        bisectors = VGroup(
+            Line(A, P, stroke_width=2), 
+            Line(B, P, stroke_width=2), 
+            Line(C, P, stroke_width=2)
+        )
+        bisector_angles = VGroup(
+            angle_bisector_equality(C, A, B, P, 1),
+            angle_bisector_equality(A, B, C, P, 2),
+            angle_bisector_equality(B, C, A, P, 3)
+        )
+        return bisectors, bisector_angles
+
+# Law of cosines
+class law_of_cosines(Scene):
+    def construct(self):        
+        A = np.array([0, 0.5, 0])
+        B = np.array([-1, -2.5, 0])
+        C = np.array([5, -2.5, 0])
+        offset = [1.6,3,0]
+        A += offset
+        B += offset
+        C += offset
+        triangle = Polygon(A, B, C) 
+        point_labels = VGroup(
+            Tex("A").move_to(A + [0, 0.2, 0]),
+            Tex("B").move_to(B + [-0.2, -0.2, 0]),
+            Tex("C").move_to(C + [0.2, -0.2, 0]),
+        )
+        edge_labels = VGroup(
+            Tex("a").move_to((B + C) / 2 + [0, -0.2, 0]),
+            Tex("b").move_to((A + C) / 2 + [0.2, 0.2, 0]),
+            Tex("c").move_to((A + B) / 2 + [-0.2, 0, 0]),
+        )
+        triangle_group = VGroup(triangle, point_labels, edge_labels)
+        self.play(Create(triangle_group))
+        
+        A_foot = foot_of_perpendicular(B,A,C)
+        height = DashedLine(A, A_foot, **line_args)
+        height_label = MathTex("h").move_to((A + A_foot) / 2 + [0.2, 0, 0])
+        P_label = MathTex("P").move_to(A_foot + [0.2, -0.2, 0])
+        self.play(Create(height), Create(height_label))
+
+        self.wait(5)
+
+        x_label = MathTex("x").move_to((C + A_foot) / 2 + [0, 0.2, 0])
+        self.play(Create(x_label))
+        self.wait(5)
+
+        t0 = MathTex(r"\cos(C)=\frac{PC}{AC}=x/b").to_corner(UL)
+        self.play(Create(t0))
+        self.wait(5)
+        t01 = MathTex(r"x = b\cos(C)").next_to(t0, DOWN, **align_args)
+        self.play(Create(t01))
+        self.play(FadeOut(t0), t01.animate.to_corner(UL))
+        self.wait(5)
+
+        t1 = MathTex(r"b^2=x^2+h^2").next_to(t01, DOWN, **align_args)
+        t2 = MathTex("c^2=h^2+(a-x)^2").next_to(t1, DOWN, **align_args)
+        self.play(Create(t1), Create(t2))
+        self.wait(5)
+
+        t3 = MathTex(r"c^2&=(b^2-x^2)+(a-x)^2\\",
+                    r"&=(b^2-x^2+a^2-2ax+x^2)\\",
+                    r"&=a^2+b^2-2ax=a^2+b^2-2ab\cos(C)\\").next_to(t2, DOWN, **align_args)
+        self.play(Create(t3[0]))
+        self.wait(1)
+        self.play(Write(t3[1]))
+        self.wait(1)
+        self.play(Write(t3[2]))
+
+# Euler's theorem
+
+class eulers_theorem(Scene):
+    def construct(self):
+
+        A = np.array([3, 1, 0])
+        B = np.array([2, -1.5, 0])
+        C = np.array([6, -1.5, 0])
+        triangle = Polygon(A, B, C)
+        point_labels = VGroup(
+            Tex("A").move_to(A + [0, 0.2, 0]),
+            Tex("B").move_to(B + [-0.2, -0.2, 0]),
+            Tex("C").move_to(C + [0.2, -0.2, 0]),
+        )
+        self.play(Create(triangle), Create(point_labels))
+
+        circumcenter, O, R = self.circumcenter(A, B, C)
+        centroid, G = self.centroid(A, B, C)
+
+        H = ((G-O)*2) + G 
+        H_point = Circle(**point_args).move_to(H)
+        H_label = MathTex("H").move_to(H + [-0.2, 0, 0]).scale(0.5)
+        euler_line = Line(H, O, **line_args)
+        self.play(Create(euler_line), Create(H_point), Create(H_label))
+        self.wait(5)
+
+        M = (B + C)/2 
+        M_point = Circle(**point_args).move_to(M).scale(0.5)
+        M_label = MathTex("M").move_to(M + [0.2, -0.2, 0])
+        self.play(Create(M_point), Create(M_label))
+        self.wait(5)
+
+        AH = Line(A, H, **line_args)
+        AM = Line(A, M, **line_args)
+        OM = Line(O, M, **line_args)
+        OM_angle = Angle.from_three_points(C, M, O, stroke_width=2, elbow=True, radius=0.1)
+        self.play(Create(AH), Create(AM), Create(OM), Create(OM_angle))
+        self.wait(5)
+
+        t00 = MathTex(r"AG =2GM").to_corner(UL)
+        self.play(Create(t00))
+        self.wait(5)
+
+        t0 = MathTex(r"HG = 2OM").next_to(t00, DOWN, **align_args)
+        self.play(Create(t0))
+        self.wait(5)
+
+        radius=0.2
+
+        t1 = MathTex(r"\angle AGH = \angle MGO").next_to(t0, DOWN, **align_args)
+        AGH_angle = Angle.from_three_points(A, G, H, radius=radius, stroke_width=2)
+        MGO_angle = Angle.from_three_points(M, G, O, radius=radius, stroke_width=2)
+        self.play(Create(AGH_angle), Create(MGO_angle), Create(t1))
+        self.wait(5)
+
+        similarity = MathTex(r"\triangle AGH \sim \triangle MGO").next_to(t1, DOWN, **align_args)
+        self.play(Create(similarity))
+        self.wait(5)
+
+        self.play(similarity.animate.to_corner(UL))
+        t2 = MathTex(r"\angle AHO = \angle MOG").next_to(similarity, DOWN, **align_args)
+        self.play(FadeOut(t00, t0, t1), Create(t2))
+        self.wait(5)
+        t3 = MathTex(r"AH \| MO").next_to(t2, DOWN, **align_args)
+        self.play(Create(t3))
+        self.wait(5)
+
+        t4 = MathTex(r"AH \perp BC").next_to(t3, DOWN, **align_args)
+        self.play(Create(t4))
+        self.wait(5)
+
+        self.play(FadeOut(AM, euler_line, OM, OM_angle, AGH_angle, MGO_angle, centroid, circumcenter))
+        self.wait(5)
+
+        A_foot = foot_of_perpendicular(B,A,C)
+        B_foot = foot_of_perpendicular(A,B,C)
+        C_foot = foot_of_perpendicular(A,C,B)
+        H_A_foot = Line(H, A_foot, **line_args)
+        A_foot_angle = Angle.from_three_points(A, A_foot, C, radius=radius, stroke_width=2, elbow=True)
+        self.play(Create(H_A_foot), Create(A_foot_angle))
+        self.wait(5)
+        B_foot_angle = Angle.from_three_points(B, B_foot, A, radius=radius, stroke_width=2, elbow=True)
+        C_foot_angle = Angle.from_three_points(C, C_foot, B, radius=radius, stroke_width=2, elbow=True)
+        B_altitude = Line(B, B_foot, **line_args)
+        C_altitude = Line(C, C_foot, **line_args)
+        self.play(Create(B_foot_angle), Create(C_foot_angle), Create(B_altitude), Create(C_altitude))
+        self.wait(5)
+
+
+    def circumcenter(self, A, B, C):
+        x, y, r = calculate_circumcircle(A, B, C)
+        P = np.array([x, y, 0])
+
+        m_AB = (A + B)/2
+        m_BC = (B + C)/2
+        m_AC = (A + C)/2
+
+        perp_bisector_group = VGroup(
+            Line(m_AB, P, stroke_width=2),
+            Line(m_BC, P, stroke_width=2),
+            Line(m_AC, P, stroke_width=2),
+            Angle.from_three_points(A, m_AB, P, radius=0.2, elbow=True, stroke_width=2),
+            Angle.from_three_points(B, m_BC, P, radius=0.2, elbow=True, stroke_width=2),
+            Angle.from_three_points(C, m_AC, P, radius=0.2, elbow=True, stroke_width=2)
+        )
+        self.play(Create(perp_bisector_group))
+
+        circumcenter = Circle(**point_args).move_to(P)
+        circumcenter_label = MathTex("O").scale(0.5).move_to(P + [0.2, -0.2, 0])
+        self.play(Create(circumcenter))
+        self.play(FadeOut(perp_bisector_group))
+        self.play(Write(circumcenter_label))
+
+        return VGroup(circumcenter, circumcenter_label), P, r
+
+    def centroid(self, A, B, C):
+        m_AB = (A + B)/2
+        m_BC = (B + C)/2
+        m_AC = (A + C)/2
+        line_args = {"stroke_width": 2, "color": WHITE}
+        median_A = Line(A, m_BC, **line_args)
+        median_B = Line(B, m_AC, **line_args)
+        median_C = Line(C, m_AB, **line_args)
+
+        self.play(Create(median_A), Create(median_B), Create(median_C))
+        P = (A + B + C)/3
+        centroid = Circle(**point_args).move_to(P)
+        centroid_label = MathTex("G").scale(0.5).move_to(P + [-0.2, -0.2, 0])
+        self.play(Create(centroid))
+        self.play(FadeOut(median_A, median_B, median_C))
+        self.play(Write(centroid_label))
+        return VGroup(centroid, centroid_label), P
     
+
+# Heron's formula
+class herons_formula(Scene):
+    def construct(self):
+        A = np.array([0, 0.5, 0])
+        B = np.array([-1, -2.5, 0])
+        C = np.array([5, -2.5, 0])
+        offset = [0,-0.5,0]
+        A += offset
+        B += offset
+        C += offset
+        triangle = Polygon(A, B, C) 
+        point_labels = VGroup(
+            Tex("A").move_to(A + [0, 0.2, 0]),
+            Tex("B").move_to(B + [-0.2, -0.2, 0]),
+            Tex("C").move_to(C + [0.2, -0.2, 0]),
+        )
+        edge_labels = VGroup(
+            Tex("a").move_to((B + C) / 2 + [0, -0.2, 0]),
+            Tex("b").move_to((A + C) / 2 + [0.2, 0.2, 0]),
+            Tex("c").move_to((A + B) / 2 + [-0.2, 0, 0]),
+        )
+
+        self.play(Create(triangle), Create(point_labels), Create(edge_labels))
+        self.wait(5)
+
+        t0 = MathTex(r"K=",r"\frac{1}{2}ab\sin(C)").to_corner(UL)
+        self.play(Create(t0))
+        self.wait(5)
+        t01 = MathTex(r"4K^2=",r"a^2b^2\sin^2(C)").to_corner(UL)
+        self.play(TransformMatchingShapes(t0, t01))
+        self.wait(5)
+        t02 = MathTex(r"4K^2=",r"a^2b^2(1-\cos^2(C))").to_corner(UL)
+        self.play(TransformMatchingShapes(t01, t02))
+        self.wait(5)
+        
+        t1 = MathTex(r"c^2=a^2+b^2-2ab\cos(C)").next_to(t0, DOWN, **align_args)
+        self.play(Create(t1))
+        t11 = MathTex(r"\cos(C) =\frac{c^2-a^2-b^2}{2ab}").next_to(t0, DOWN, **align_args)
+        self.play(TransformMatchingShapes(t1, t11))
+        self.wait(5)
+
+        t2 = MathTex(r"4K^2=",r"a^2b^2\left(1-\frac{(c^2-a^2-b^2)^2}{4a^2b^2}\right)").to_corner(UL)
+        self.play(TransformMatchingShapes(VGroup(t02, t11), t2))
+        self.wait(5)
+
+        t3 = MathTex(r"4K^2=",r"a^2b^2-\frac{(c^2-a^2-b^2)^2}{4}").to_corner(UL)
+        self.play(TransformMatchingShapes(t2, t3))
+        self.wait(5)
+
+        t4 = MathTex(r"16K^2&=4a^2b^2-(c^2-a^2-b^2)^2\\",
+                     r"&=[2ab+(c^2-a^2-b^2)][2ab-(c^2-a^2-b^2)]\\",
+                     r"&=[(c^2(a-b)^2)][(a+b)^2-c^2]\\",
+                     r"&=[c+(a-b)][c-(a-b)][(a+b)+c][(a+b)-c]"                 
+                     
+                     ).to_corner(UL)
+        self.play(TransformMatchingShapes(t3, t4[0]))
+        self.wait(5)
+        self.play(Create(t4[1]))
+        self.wait(5)
+        self.play(Create(t4[2]))
+        self.wait(5)
+        self.play(Create(t4[3]))
+        self.wait(5)
+        t5 = MathTex(r"16K^2=[c+(a-b)][c-(a-b)][(a+b)+c][(a+b)-c]").to_corner(UL)
+        self.play(TransformMatchingShapes(VGroup(t4[0], t4[3]), t5), FadeOut(t4[1],t4[2]))
+        self.wait(5)
+        t6 = MathTex(r"s=\frac{a+b+c}{2}").next_to(t5, DOWN, **align_args)
+        self.play(Create(t6))
+        self.wait(5)
+
+        t7 = MathTex("c+(a-b)=c+a-b = (a+b+c)-2b = 2s-2b=2(s-b)").next_to(t6, DOWN, **align_args)
+        self.play(Create(t7))
+        self.wait(5)
+        t8 = MathTex("b+c-a = 2(s-a)").next_to(t7, DOWN, **align_args)
+        t9 = MathTex("a+b-c = 2(s-c)").next_to(t8, DOWN, **align_args)
+        t10 = MathTex("a+b+c = 2s").next_to(t9, DOWN, **align_args)
+        self.play(Create(t8),Create(t9), Create(t10))
+        self.wait(5)
+
+        t11 = MathTex("16K^2 =2(s-a)2(s-b)2(s-c)2s").to_corner(UL)
+        self.play(FadeOut(t5), FadeOut(t6,t7,t8,t9,t10), Create(t11))
+        self.wait(5)
+
+        t12 = MathTex("K^2 =s(s-a)(s-b)(s-c)").to_corner(UL)
+        self.play(TransformMatchingShapes(t11, t12))
+        self.wait(5)
+
+        
 
 def angle_bisector_equality(B, A, C, P, n):
         angle_group = VGroup()
@@ -1247,27 +1639,3 @@ def seg_intersect(a1,a2, b1,b2) :
     denom = np.dot( dap, db)
     num = np.dot( dap, dp )
     return (num / denom.astype(float))*db + b1
-
-class Example(Scene): 
-    def new_play(self, *args):
-        self.i += 1
-        self.remove(self.pagenum)
-        self.pagenum = Text(str(self.i)).to_corner(DL)
-        self.add(self.pagenum)
-        self.old_play(*args)
-        
-    def construct(self):
-        self.i = 0
-        self.pagenum = Text("0").to_corner(DL)
-        self.old_play = self.play
-        self.play = self.new_play
-        
-        A = np.array([0, 0.5, 0])
-        B = np.array([-1, -2.5, 0])
-        C = np.array([5, -2.5, 0])
-        self.play(Line(A, B))
-        self.play(Line(B, C))
-        self.play(Line(C, A))
-        self.play(Write(Tex("A").move_to(A + [0, 0.2, 0])))
-        self.play(Write(Tex("B").move_to(B + [-0.2, -0.2, 0])))
-        self.play(Write(Tex("C").move_to(C + [0.2, -0.2, 0])))
